@@ -15,15 +15,17 @@
 import os
 import subprocess
 
-import cog
+generated = False
 
+def name(filename: str) -> str:
+    return os.path.splitext(os.path.basename(filename))[0]
 
-def name() -> str:
-    return os.path.splitext(os.path.basename(cog.inFile))[0]
+def static(filename: str) -> str:
+    with open(filename) as file:
+        return file.read().rstrip()
 
-
-def init(filename: str, **kwargs: str) -> str:
-    args = ["cog", "-d", "-I", os.path.dirname(__file__), "-p", "import ssg; init = True"]
+def generate(filename: str, **kwargs: str) -> str:
+    args = ["cog", "-d", "-I", os.path.dirname(__file__), "-p", "import ssg; ssg.generated = True"]
 
     for arg in kwargs.items():
         args.append("-D")
@@ -32,11 +34,5 @@ def init(filename: str, **kwargs: str) -> str:
     args.append(filename)
     return subprocess.run(args, capture_output=True, check=True, encoding="UTF-8").stdout.rstrip()
 
-
-def text(filename: str) -> str:
-    with open(filename, encoding="UTF-8") as file:
-        return file.read().rstrip()
-
-
-def format(**kwargs: str) -> None:
-    cog.out(eval(f'f"""{cog.previous}"""', kwargs))
+def format(input_: str, **kwargs: str) -> str:
+    return eval(f'f"""{input_}"""', kwargs)
