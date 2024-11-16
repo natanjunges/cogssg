@@ -15,17 +15,20 @@
 import os
 import subprocess
 
-generated = False
+included = False
 
 def name(filename: str) -> str:
     return os.path.splitext(os.path.basename(filename))[0]
 
-def static(filename: str) -> str:
+def format(input_: str, **kwargs: str) -> str:
+    return eval(f'f"""{input_}"""', kwargs)
+
+def include_static(filename: str) -> str:
     with open(filename) as file:
         return file.read().rstrip()
 
-def generate(filename: str, **kwargs: str) -> str:
-    args = ["cog", "-d", "-I", os.path.dirname(__file__), "-p", "import ssg; ssg.generated = True"]
+def include_generate(filename: str, **kwargs: str) -> str:
+    args = ["cog", "-d", "-I", os.path.dirname(__file__), "-p", "import ssg; ssg.included = True"]
 
     for arg in kwargs.items():
         args.append("-D")
@@ -33,6 +36,3 @@ def generate(filename: str, **kwargs: str) -> str:
 
     args.append(filename)
     return subprocess.run(args, capture_output=True, check=True, encoding="UTF-8").stdout.rstrip()
-
-def format(input_: str, **kwargs: str) -> str:
-    return eval(f'f"""{input_}"""', kwargs)
