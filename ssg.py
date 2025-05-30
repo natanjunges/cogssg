@@ -15,7 +15,13 @@
 import os
 import subprocess
 
-included = False
+included: bool = False
+
+LT: str = "<"
+GT: str = ">"
+
+def bool(value: str) -> bool:
+    return value == "True"
 
 def name(filename: str) -> str:
     return os.path.splitext(os.path.basename(filename))[0]
@@ -28,7 +34,7 @@ def include_static(filename: str) -> str:
         return file.read().rstrip()
 
 def include_generate(filename: str, **kwargs: str) -> str:
-    args = ["cog", "-d", "-I", os.path.dirname(__file__), "-p", "import ssg; ssg.included = True"]
+    args = ["cog", "-d", "-p", "import ssg; ssg.included = True"]
 
     for arg in kwargs.items():
         args.append("-D")
