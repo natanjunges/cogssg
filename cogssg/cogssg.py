@@ -14,6 +14,9 @@
 
 import os
 import subprocess
+import sys
+
+from cogapp import Cog
 
 included: bool = False
 
@@ -34,7 +37,7 @@ def include_static(filename: str) -> str:
         return file.read().rstrip()
 
 def include_generate(filename: str, **kwargs: str) -> str:
-    args = ["cog", "-d", "-p", "import ssg; ssg.included = True"]
+    args = ["cog", "-d", "-p", "import cogssg as ssg; ssg.included = True"]
 
     for arg in kwargs.items():
         args.append("-D")
@@ -42,3 +45,6 @@ def include_generate(filename: str, **kwargs: str) -> str:
 
     args.append(filename)
     return subprocess.run(args, capture_output=True, check=True, encoding="UTF-8").stdout.rstrip()
+
+def main():
+    return Cog().main(["cog", "-p", "import cogssg as ssg", "-r", sys.argv[1]])
